@@ -143,7 +143,7 @@ public class Vehicle {
         Item item = this.ordered.get(0);
         Tile tile = this.grid.findAndReserve(this, item);
         if (tile == null){
-            System.out.println("Invalid order loaded");
+            System.out.println("Tento error");
             System.exit(-1);
         }
 

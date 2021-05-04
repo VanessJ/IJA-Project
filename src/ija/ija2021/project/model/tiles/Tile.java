@@ -20,21 +20,21 @@ public class Tile {
     }
 
     public void setAsOccupied(){
+
+        this.type = TileType.BLOCKAGE;
         this.occupied = true;
     }
 
     public void clear (){
-        if (this.occupied = true){
+        if (this.type == TileType.BLOCKAGE){
+            this.type = TileType.PATH;
             this.occupied = false;
         }
     }
 
+
     public boolean isOccupied() {
-        if (this.occupied == true) {
-            return true;
-        } else {
-            return false;
-        }
+        return this.occupied;
     }
 
     public boolean isShelf() {

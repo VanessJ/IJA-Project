@@ -30,9 +30,7 @@ public class Grid {
 
             String line = in.nextLine();
             this.dimension = Integer.parseInt(line);
-            System.out.println(this.dimension);
             this.layout = new Tile[dimension][dimension];
-
 
             for(int i=0; i<this.dimension; i++){
                 line = in.nextLine();
@@ -71,6 +69,17 @@ public class Grid {
         }
     }
 
+
+    public void blockAndClear (int x, int y){
+        Tile tile = this.layout[x][y];
+        if (!tile.isOccupied() && !tile.isDP()){
+            tile.setAsOccupied();
+        }
+        else if (tile.isBlockage()){
+            tile.clear();
+        }
+
+    }
 
 
     public boolean addItem(Item item){
