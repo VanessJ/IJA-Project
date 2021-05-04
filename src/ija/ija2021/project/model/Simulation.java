@@ -37,15 +37,29 @@ public class Simulation {
         this.distributeOrder();
 
         Vehicle vehicle = this.vehicles.get(2);
+        vehicle.nextMove();
+        vehicle.nextMove();
+        vehicle.nextMove();
+        vehicle.nextMove();
         Vehicle vehicle2 = this.vehicles.get(1);
+        vehicle2.nextMove();
+        vehicle2.nextMove();
+        vehicle2.nextMove();
+        vehicle2.nextMove();
+        vehicle2.nextMove();
 
-        while(true){
+        /*while(true){
             //Thread.sleep(500);
             vehicle.nextMove();
             vehicle2.nextMove();
-        }
+        }*/
     }
 
+    public void next_step(){
+        Vehicle vehicle = this.vehicles.get(2);
+        vehicle.nextMove();
+
+    }
 
     public void loadOrder(String path){
         try {
@@ -107,15 +121,15 @@ public class Simulation {
 
 
     public void generateCars(){
-        Vehicle vehicle1 = new Vehicle(10, this.grid);
+        Vehicle vehicle1 = new Vehicle(10, this.grid, 1);
         this.vehicles.add(vehicle1);
-        Vehicle vehicle2 = new Vehicle(5, this.grid);
+        Vehicle vehicle2 = new Vehicle(5, this.grid, 2);
         this.vehicles.add(vehicle2);
-        Vehicle vehicle3 = new Vehicle(2, this.grid);
+        Vehicle vehicle3 = new Vehicle(2, this.grid, 3);
         this.vehicles.add(vehicle3);
-        Vehicle vehicle4 = new Vehicle(1, this.grid);
+        Vehicle vehicle4 = new Vehicle(1, this.grid, 4);
         this.vehicles.add(vehicle4);
-        Vehicle vehicle5 = new Vehicle(5, this.grid);
+        Vehicle vehicle5 = new Vehicle(5, this.grid, 5);
         this.vehicles.add(vehicle5);
     }
 

@@ -1,11 +1,14 @@
 package ija.ija2021.project.model.tiles;
 
 
+import ija.ija2021.project.model.Vehicle;
+
 public class Tile {
 
     protected int x;
     protected int y;
     protected boolean occupied;
+    protected Vehicle vehicle;
     protected TileType type;
 
 
@@ -16,13 +19,32 @@ public class Tile {
         this.y = y;
         this.occupied = false;
         this.type = TileType.PATH;
-
     }
 
+    public Vehicle getVehicle() {
+        return vehicle;
+    }
+
+    public boolean hasVehicle(){
+        if(this.vehicle != null){
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     public void setAsOccupied(){
 
         this.type = TileType.BLOCKAGE;
         this.occupied = true;
+    }
+
+    public void bindToVehicle(Vehicle vehicle){
+        this.vehicle = vehicle;
+    }
+
+    public void unbindVehicle(Vehicle vehicle){
+        this.vehicle = null;
     }
 
     public void clear (){

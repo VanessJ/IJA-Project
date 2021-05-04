@@ -7,10 +7,7 @@ import ija.ija2021.project.model.tiles.Tile;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 
 public class Grid {
 
@@ -69,8 +66,12 @@ public class Grid {
         }
     }
 
+    public Tile getTile(int x, int y){
+        return this.layout[x][y];
+    }
 
-    public void blockAndClear (int x, int y){
+
+    /*public void blockAndClear (int x, int y){
         Tile tile = this.layout[x][y];
         if (!tile.isOccupied() && !tile.isDP()){
             tile.setAsOccupied();
@@ -79,7 +80,7 @@ public class Grid {
             tile.clear();
         }
 
-    }
+    }*/
 
 
     public boolean addItem(Item item){
@@ -148,10 +149,34 @@ public class Grid {
     public void getStats(){
         for (Shelf shelf : this.shelves){
             if (!shelf.isEmpty()){
-                shelf.getStats();
+                shelf.printStats();
             }
 
         }
+    }
+
+
+    public String getShelfStats(int x, int y){
+        Shelf shelf = (Shelf)this.layout[x][y];
+        String toWrite = shelf.getStats();
+        return toWrite;
+    }
+
+
+    public Shelf getShelf(int x, int y){
+        Shelf shelf = (Shelf)this.layout[x][y];
+        return shelf;
+    }
+
+    public Vehicle getVehicle(int x, int y){
+        Tile tile = this.layout[x][y];
+        return tile.getVehicle();
+    }
+
+    public String getSVehicleStats(int x, int y){
+        Tile tile = this.layout[x][y];
+        String toWrite = tile.getVehicle().printStats();
+        return toWrite;
     }
 
     public Tile getDP(){

@@ -59,12 +59,36 @@ public class Shelf extends Tile{
         }
     }
 
-    public void getStats(){
+    public void printStats(){
+        if (this.isEmpty()){
+            System.out.println("Regal je prazdny");
+            return;
+        }
         Map<String, Long> counting = items.stream().collect(
                 Collectors.groupingBy(Item::getType, Collectors.counting()));
-        System.out.format("%d (%d, %d): ", this.number, this.x, this.y);
+        //System.out.format("%d (%d, %d): ", this.number, this.x, this.y);
         //System.out.print(": ");
-        System.out.println(counting);
+        System.out.println("Regal cislo " + this.number);
+        counting.forEach((item,getType)->System.out.println(item + ": " + getType));
+        //System.out.println(counting);
+    }
+
+    public String getStats(){
+        String toWrite = "";
+        toWrite = toWrite.concat("Regal cislo " + this.number);
+        if (this.isEmpty()){
+            toWrite = toWrite.concat(" je prazdny");
+            return toWrite;
+        }
+        toWrite = toWrite.concat(":\n");
+        Map<String, Long> counting = items.stream().collect(
+                Collectors.groupingBy(Item::getType, Collectors.counting()));
+        for (String getType : counting.keySet()){
+            toWrite = toWrite.concat("\t" + getType + ": " + counting.get(getType) + "\n");
+        }
+
+        return toWrite;
+
     }
 
     public Tile findAndReserve (Vehicle vehicle, Item toReserve){

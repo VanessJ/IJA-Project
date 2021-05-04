@@ -12,6 +12,8 @@ public class Vehicle {
     private int amount;
     private boolean ready;
     private Grid grid;
+    private Tile positionTile;
+    private int number;
     private int x;
     private int y;
     private A_Star pathfinder = new A_Star();
@@ -22,13 +24,18 @@ public class Vehicle {
     private ArrayList<Item> held = new ArrayList<Item>();
     private ArrayList<Tile> path = new ArrayList<>();
 
-    public Vehicle(int capacity, Grid grid) {
+    public Vehicle(int capacity, Grid grid, int number) {
+        this.number = number;
         this.capacity = capacity;
         this.grid = grid;
         this.amount = 0;
         this.ready = true;
-        this.x = this.grid.getDeliveryX();
-        this.y = this.grid.getDeliveryY();
+        int x = this.grid.getDeliveryX();
+        int y = this.grid.getDeliveryY();
+        this.x = x;
+        this.y = y;
+        this.positionTile = this.grid.getTile(x, y);
+        this.positionTile.bindToVehicle(this);
     }
 
     public void addToOrdered(Item item){
@@ -45,6 +52,66 @@ public class Vehicle {
     public void setComingFor(Item comingFor) {
         this.comingFor = comingFor;
     }
+
+
+
+    public boolean hasPath(){
+        if (this.path != null){
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    public ArrayList<Tile> getPath() {
+        return path;
+    }
+
+    public String printStats(){
+        String toWrite = "";
+        toWrite = toWrite.concat("Vozik cislo " + this.number + "\n\n");
+        toWrite = toWrite.concat("Objednavky: \n");
+        if (this.ordered.size() == 0){
+            toWrite = toWrite.concat("\t Zoznam objednavok je prazdny");
+            return toWrite;
+        }
+        else {
+            toWrite = toWrite.concat(this.getOrders());
+
+        }
+        toWrite = toWrite.concat("Aktualny naklad: \n");
+        if (this.held.size() == 0){
+            toWrite = toWrite.concat("\t Vozik je prazdny");
+            return toWrite;
+        }
+        else {
+            toWrite = toWrite.concat(this.getOrders());
+        }
+        return toWrite;
+    }
+
+    public String getOrders(){
+        String toWrite = "";
+        Map<String, Long> counting = this.ordered.stream().collect(
+                Collectors.groupingBy(Item::getType, Collectors.counting()));
+        for (String getType : counting.keySet()){
+            toWrite = toWrite.concat("\t" + getType + ": " + counting.get(getType) + "\n");
+        }
+        return toWrite;
+    }
+
+    public String getHeld(){
+        String toWrite = "";
+        Map<String, Long> counting = this.held.stream().collect(
+                Collectors.groupingBy(Item::getType, Collectors.counting()));
+        for (String getType : counting.keySet()){
+            toWrite = toWrite.concat("\t" + getType + ": " + counting.get(getType) + "\n");
+        }
+        return toWrite;
+    }
+
+
 
     public void nextMove(){
 
@@ -74,7 +141,7 @@ public class Vehicle {
                         Item item = this.ordered.remove(0);
                         this.ordered.add(item);
                     }
-                    this.ordered.remove(0);
+                    this.setComingFor(this.ordered.get(0));
                     this.path = path;
 
                 }
@@ -99,7 +166,9 @@ public class Vehicle {
 
                 if (this.comingFor != null){
                     //ide za nejakym objektom
+                    this.ordered.remove(0); //removne to z objednavky
                     System.out.println("Vozik nabral objekt " + this.comingFor.getType());
+                    this.setComingFor(null);
                     grid.findAndRemove(this.comingFor);
                     this.held.add(this.comingFor);
                     this.comingFor = null;
@@ -123,7 +192,7 @@ public class Vehicle {
                 Tile tile = this.path.remove(0);
                 int newX = tile.getX();
                 int newY = tile.getY();
-                this.setCoords(newX, newY);
+                this.moveTo(newX, newY);
                 System.out.format("Vozik stoji na suradnici %d %d\n", newX, newY);
             }
         }
@@ -135,6 +204,17 @@ public class Vehicle {
     public void setCoords(int newX, int newY){
         this.x = newX;
         this.y = newY;
+    }
+
+    public void moveTo(int newX, int newY){
+        Tile tile = this.grid.getTile(this.x, this.y);
+        tile.unbindVehicle(this);
+        this.x = newX;
+        this.y = newY;
+
+        tile = this.grid.getTile(newX, newY);
+        tile.bindToVehicle(this);
+        this.positionTile = tile;
     }
 
     public ArrayList<Tile> calculatePath(){
