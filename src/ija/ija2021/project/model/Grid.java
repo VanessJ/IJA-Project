@@ -108,13 +108,13 @@ public class Grid {
 
 
     public void findAndRemove (Item toRemove){
-        Tile tile;
         for (Shelf shelf: this.shelves){
             boolean removed = shelf.findAndRemove(toRemove);
             if (removed){
                 return;
             }
         }
+        System.out.println("Tu by sa to dostat nemalo");
     }
 
 

@@ -6,9 +6,11 @@ import ija.ija2021.project.model.Simulation;
 import ija.ija2021.project.model.Vehicle;
 import ija.ija2021.project.model.tiles.Shelf;
 import ija.ija2021.project.model.tiles.Tile;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 
@@ -19,13 +21,21 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 
 public class Controller {
 
+    private int speedLevel;
+    private int speed;
     private Simulation simulation;
     private final int GRID_WIDTH = 600;
     private final int GRID_HEIGHT = 460;
+    final Timer t = new Timer();
 
     private Shelf focusShelf;
     private Vehicle focusVehicle;
@@ -36,10 +46,19 @@ public class Controller {
     public TextField zadat;
     public GridPane maingrid;
     public Button replay;
+    public Label time;
+    public Label speedSetting;
+    public Button faster;
+    public Button slower;
+
+
 
 
     public void init(){
 
+        this.speedLevel = 5;
+        this.setSpeed();
+        this.objednavka.setEditable(false);
          this.simulation = new Simulation();
          simulation.loadGrid();
          Grid grid = simulation.getGrid();
@@ -57,9 +76,114 @@ public class Controller {
              }
          }
 
-        simulation.simulate();
-         this.redraw(grid);
+         simulation.simulate();
 
+        /*ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        Runnable updater = new Runnable() {
+            @Override
+            public void run() {
+                Runnable sim = new Runnable() {
+                    @Override
+                    public void run() {
+                        simulation.next_step();
+                        redraw(grid);
+
+                    }
+                };
+                Platform.runLater(sim);
+            }
+        };
+
+        scheduler.scheduleAtFixedRate(updater, 0, this.speed, TimeUnit.MILLISECONDS);*/
+
+         t.schedule(new toSchedule(), this.speed);
+
+         //t.schedule(toSchedule(), this.speed);
+         /*TimerTask tt = new TimerTask() {
+            @Override
+            public void run() {
+
+                    simulation.next_step();
+                    redraw(grid);
+
+            };
+        };
+        t.scheduleAtFixedRate(tt,100,this.speed);*/
+
+         /*for (int i = 0; i < 45; i++){
+             simulation.next_step();
+        }*/
+
+
+         //this.redraw(grid);
+
+
+
+    }
+
+
+    public void lowerSpeed(){
+        if (this.speedLevel > 0){
+            this.speedLevel--;
+            setSpeed();
+        }
+
+    }
+
+    public void fasterSpeed(){
+        if (this.speedLevel < 10){
+            this.speedLevel++;
+            setSpeed();
+        }
+    }
+
+    public void setSpeed(){
+        switch(this.speedLevel){
+            case 0:
+                this.speed = 5000;
+                break;
+            case 1:
+                this.speed = 3000;
+                break;
+            case 2:
+                this.speed = 2000;
+                break;
+            case 3:
+                this.speed = 1000;
+                break;
+            case 4:
+                this.speed = 800;
+                break;
+            case 5:
+                this.speed = 600;
+                break;
+            case 6:
+                this.speed = 400;
+                System.out.println("6");
+                break;
+            case 7:
+                this.speed = 200;
+                System.out.println("7");
+                break;
+            case 8:
+                this.speed = 100;
+                System.out.println("8");
+                break;
+            case 9:
+                this.speed = 50;
+                System.out.println("9");
+                break;
+            case 10:
+                this.speed = 10;
+                System.out.println("10");
+                break;
+            default:
+                this.speed = 500;
+                System.out.println("default");
+                break;
+        }
+        String s = String.format("     %d/10", this.speedLevel);
+        speedSetting.setText(s);
 
     }
 
@@ -238,7 +362,9 @@ public class Controller {
             int amount = Integer.parseInt(split[1]);
             for (int i = 0; i < amount; i++){
                 Item item = new Item(itemType);
-                this.focusVehicle.addToOrdered(item);
+                if (this.focusVehicle != null){
+                    this.focusVehicle.addToOrdered(item);
+                }
             }
         }
         redraw(this.simulation.getGrid());
@@ -271,6 +397,18 @@ public class Controller {
             this.getChildren().addAll(rectangle);
         }
     }
+
+
+    class toSchedule extends TimerTask {
+        public void run() {
+
+            nextStep();
+            redraw(simulation.getGrid());
+            t.schedule(new toSchedule(), speed);
+
+        }
+    }
+
 
 }
 

@@ -19,7 +19,7 @@ public class A_Star {
 
         for (Tile[] tile_row : grid.layout) {
             for (Tile tile : tile_row) {
-                if (tile.isOccupied()) {
+                if (tile.isOccupied() || tile.hasVehicle()) {
                     int i = tile.getX();
                     int j = tile.getY();
                     Node n = new Node(i, j, "OBSTACLE");
@@ -44,13 +44,18 @@ public class A_Star {
         }
         else {
 
-                /**System.out.println("--- Path to target ---");
+                /*System.out.println("--- Path to target ---");
                 graph.printPath(path);*/
                 ArrayList<Tile> tiles = this.convertToTile(path);
+                if (tiles.size() >= 1){
+                    tiles.remove(0);
+                }
+                tiles.add(this.grid.layout[end_x][end_y]);
                 return tiles;
 
 
             }
+
 
     }
 

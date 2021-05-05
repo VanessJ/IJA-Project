@@ -10,12 +10,13 @@ import java.util.stream.Collectors;
 public class Vehicle {
     private int capacity;
     private int amount;
-    private boolean ready;
+    private boolean active;
     private Grid grid;
     private Tile positionTile;
     private int number;
     private int x;
     private int y;
+    private boolean finished;
     private A_Star pathfinder = new A_Star();
     private Item comingFor;
 
@@ -29,7 +30,8 @@ public class Vehicle {
         this.capacity = capacity;
         this.grid = grid;
         this.amount = 0;
-        this.ready = true;
+        this.active = false;
+        this.finished = false;
         int x = this.grid.getDeliveryX();
         int y = this.grid.getDeliveryY();
         this.x = x;
@@ -54,6 +56,9 @@ public class Vehicle {
     }
 
 
+    public boolean isFinished(){
+        return this.finished;
+    }
 
     public boolean hasPath(){
         if (this.path != null){
@@ -71,10 +76,10 @@ public class Vehicle {
     public String printStats(){
         String toWrite = "";
         toWrite = toWrite.concat("Vozik cislo " + this.number + "\n\n");
+        toWrite = toWrite.concat("Kapacita: " + this.capacity + "\n\n");
         toWrite = toWrite.concat("Objednavky: \n");
         if (this.ordered.size() == 0){
-            toWrite = toWrite.concat("\t Zoznam objednavok je prazdny");
-            return toWrite;
+            toWrite = toWrite.concat("\tZiadne objednavky\n");
         }
         else {
             toWrite = toWrite.concat(this.getOrders());
@@ -83,10 +88,9 @@ public class Vehicle {
         toWrite = toWrite.concat("Aktualny naklad: \n");
         if (this.held.size() == 0){
             toWrite = toWrite.concat("\t Vozik je prazdny");
-            return toWrite;
         }
         else {
-            toWrite = toWrite.concat(this.getOrders());
+            toWrite = toWrite.concat(this.getHeld());
         }
         return toWrite;
     }
@@ -111,84 +115,113 @@ public class Vehicle {
         return toWrite;
     }
 
+    public boolean isFull(){
+        if (this.amount >= this.capacity){
+            return true;
+        }
+        return false;
+    }
 
 
     public void nextMove(){
 
-        if (this.ordered.size() == 0){
-            System.out.println("Vozik splnil svoje poslanie a moze spokojne umriet");
-            System.exit(0);
+        if((this.finished)&& (this.ordered.size()!= 0)){
+            System.out.println("Lenive hovna");
+            this.finished = false;
         }
 
-
-        if (this.path.size() == 0){
-            //nema ziadnu cestu naplanovanu
-
-
-            if (this.amount == this.capacity){
-                if (path != null){
-                    this.path = path;
-                }
+        if ((this.ordered.size() == 0) && (!this.active)){
+            ArrayList<Tile> path = this.returnToDP();
+            if (path == null){
+                return;
             }
-
-
-            if (this.ordered.size() > 0){
-                if (this.amount < this.capacity){
-                    ArrayList<Tile> path = this.calculatePath();
-                    if (path == null){
-                        //nenasla sa, prida sa na koniec listu
-                        System.out.println("Cesta sa nenasla");
-                        Item item = this.ordered.remove(0);
-                        this.ordered.add(item);
-                    }
-                    this.setComingFor(this.ordered.get(0));
-                    this.path = path;
-
-                }
-
-                else {
-                    //uz nema kapacitu (asi)
-                    ArrayList<Tile> path = this.returnToDP();
-                    System.out.println("Vozik je plny, rozhodol sa ist k DP");
-                    this.path = path;
-
-
-                }
-
-            }
-
+            this.path = path;
+            System.out.println(this.path.size());
+            this.active = true;
         }
 
-        //ma cestu
+        if(isFinished()){
+            Tile tile = this.grid.getTile(this.x, this.y);
+            System.out.println("Auto skoncilo");
+            tile.unbindVehicle(this);
+            return;
+        }
+        //nacita objednavku
+        if (!active){
+            if (this.isFull()){
+                ArrayList<Tile> path = this.returnToDP();
+                if (path == null){
+                    return;
+                }
+                System.out.println("Vozik je plny, rozhodol sa ist k DP");
+                this.path = path;
+                this.active = true;
+            }
+            else{
+                ArrayList<Tile> path = this.calculatePath();
+                if (path == null){ //cesta sa nenasla, aktualna objednavka sa prida na koniec listu
+                    Item item = this.ordered.remove(0);
+                    this.ordered.add(item);
+                    return;
+                }
+                this.path = path;
+                this.active = true;
+            }
+        }
         else {
-            //TODO check, ci netreba prepocitat
-            if (this.path.size() == 1){
-
+            if (this.path.size() == 0){
+                //vyklada item
                 if (this.comingFor != null){
-                    //ide za nejakym objektom
                     this.ordered.remove(0); //removne to z objednavky
                     System.out.println("Vozik nabral objekt " + this.comingFor.getType());
-                    this.setComingFor(null);
-                    grid.findAndRemove(this.comingFor);
                     this.held.add(this.comingFor);
+                    grid.findAndRemove(this.comingFor);
                     this.comingFor = null;
-                    Tile tile = this.path.remove(0);
                     this.amount++;
+                    this.active = false;
                 }
-
+                //ide do DP
                 else {
-                    //ide k DP
                     System.out.println("Vozik priniesol naklad do DP");
                     this.amount = 0;
-                    while (this.held.size() > 0){
+                    while (this.held.size() != 0){
                         this.held.remove(0);
                     }
-                    Tile tile = this.path.remove(0);
-
+                    this.active = false;
+                    if (this.ordered.size() == 0){
+                        this.finished = true;
+                    }
                 }
             }
 
-            else{
+            //pohyb
+            else {
+                for (Tile path : this.path){
+                    if (path.isOccupied() || path.hasVehicle()){
+                        if (this.comingFor != null){
+                            ArrayList<Tile> path2 = this.calculatePath();
+                            if (path2 == null){
+                                //nenasla sa, prida sa na koniec listu
+                                Item item = this.ordered.remove(0);
+                                this.ordered.add(item);
+                                this.comingFor = null;
+                                this.active = false;
+                                return;
+                            }
+                            this.path = path2;
+                        }
+                        else {
+                            ArrayList<Tile> path2 = this.returnToDP();
+                            System.out.println("Toto");
+                            System.out.println("Vozik je plny, rozhodol sa ist k DP");
+                            this.path = path2;
+                            if (path2 == null){
+                                this.active = false;
+                                return;
+                            }
+                        }
+                    }
+                }
                 Tile tile = this.path.remove(0);
                 int newX = tile.getX();
                 int newY = tile.getY();
@@ -196,10 +229,8 @@ public class Vehicle {
                 System.out.format("Vozik stoji na suradnici %d %d\n", newX, newY);
             }
         }
-
-
-
     }
+
 
     public void setCoords(int newX, int newY){
         this.x = newX;
@@ -223,10 +254,9 @@ public class Vehicle {
         Item item = this.ordered.get(0);
         Tile tile = this.grid.findAndReserve(this, item);
         if (tile == null){
-            System.out.println("Tento error");
+            System.out.println("Item sa nenachadza v skladisku");
             System.exit(-1);
         }
-
 
         System.out.format("Vozik pocita cestu pre novu objednavku %s\n", item.getType());
         int start_x = this.x;
@@ -249,8 +279,8 @@ public class Vehicle {
         Tile tile = this.grid.getDP();
         int start_x = this.x;
         int start_y = this.y;
-        int end_x = tile.getX();
-        int end_y = tile.getY();
+        int end_x = grid.getDeliveryX();
+        int end_y = grid.getDeliveryY();
         ArrayList<Tile> path = this.pathfinder.a_Star(this.grid, start_x, start_y, end_x, end_y);
         return path;
     }

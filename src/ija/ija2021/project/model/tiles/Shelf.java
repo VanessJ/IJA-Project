@@ -93,9 +93,6 @@ public class Shelf extends Tile{
 
     public Tile findAndReserve (Vehicle vehicle, Item toReserve){
         for (Item item: items){
-            /**System.out.println(toReserve.getType());
-            System.out.println(item.getType());
-            System.out.println("");*/
             if (item.getType().equals(toReserve.getType())){
                 if (!item.isReserved()){
                     item.reserveItem();
@@ -109,7 +106,7 @@ public class Shelf extends Tile{
 
     public boolean findAndRemove (Item toRemove){
         for (Item item: items){
-            if (item.equals(toRemove)){
+            if (item == toRemove){
                 items.remove(item);
                 return true;
             }

@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 
@@ -36,7 +37,7 @@ public class Simulation {
         this.generateCars();
         this.distributeOrder();
 
-        Vehicle vehicle = this.vehicles.get(2);
+        /*Vehicle vehicle = this.vehicles.get(2);
         vehicle.nextMove();
         vehicle.nextMove();
         vehicle.nextMove();
@@ -46,18 +47,17 @@ public class Simulation {
         vehicle2.nextMove();
         vehicle2.nextMove();
         vehicle2.nextMove();
-        vehicle2.nextMove();
+        vehicle2.nextMove();*/
 
-        /*while(true){
-            //Thread.sleep(500);
-            vehicle.nextMove();
-            vehicle2.nextMove();
-        }*/
     }
 
     public void next_step(){
-        Vehicle vehicle = this.vehicles.get(2);
-        vehicle.nextMove();
+        /*Vehicle vehicle = this.vehicles.get(0);
+        vehicle.nextMove();*/
+
+        for (Vehicle vehicle : this.vehicles){
+            vehicle.nextMove();
+        }
 
     }
 
