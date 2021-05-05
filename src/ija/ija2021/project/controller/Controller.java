@@ -6,7 +6,6 @@ import ija.ija2021.project.model.Simulation;
 import ija.ija2021.project.model.Vehicle;
 import ija.ija2021.project.model.tiles.Shelf;
 import ija.ija2021.project.model.tiles.Tile;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -23,15 +22,13 @@ import javafx.scene.shape.StrokeType;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 
 public class Controller {
 
     private int speedLevel;
     private int speed;
+    private long simTime = 10000L;
     private Simulation simulation;
     private final int GRID_WIDTH = 600;
     private final int GRID_HEIGHT = 460;
@@ -44,9 +41,9 @@ public class Controller {
     @FXML
     public TextArea objednavka;
     public TextField zadat;
+    public TextField skuska;
     public GridPane maingrid;
     public Button replay;
-    public Label time;
     public Label speedSetting;
     public Button faster;
     public Button slower;
@@ -55,10 +52,10 @@ public class Controller {
 
 
     public void init(){
-
         this.speedLevel = 5;
         this.setSpeed();
         this.objednavka.setEditable(false);
+        this.skuska.setEditable(false);
          this.simulation = new Simulation();
          simulation.loadGrid();
          Grid grid = simulation.getGrid();
@@ -78,49 +75,17 @@ public class Controller {
 
          simulation.simulate();
 
-        /*ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        Runnable updater = new Runnable() {
-            @Override
-            public void run() {
-                Runnable sim = new Runnable() {
-                    @Override
-                    public void run() {
-                        simulation.next_step();
-                        redraw(grid);
-
-                    }
-                };
-                Platform.runLater(sim);
-            }
-        };
-
-        scheduler.scheduleAtFixedRate(updater, 0, this.speed, TimeUnit.MILLISECONDS);*/
 
          t.schedule(new toSchedule(), this.speed);
 
-         //t.schedule(toSchedule(), this.speed);
-         /*TimerTask tt = new TimerTask() {
-            @Override
-            public void run() {
-
-                    simulation.next_step();
-                    redraw(grid);
-
-            };
-        };
-        t.scheduleAtFixedRate(tt,100,this.speed);*/
-
-         /*for (int i = 0; i < 45; i++){
-             simulation.next_step();
-        }*/
-
-
-         //this.redraw(grid);
-
-
-
     }
 
+    public void restart(){
+        this.simulation = new Simulation();
+        this.simulation.loadGrid();
+        this.simulation.simulate();
+        this.simTime = 0;
+    }
 
     public void lowerSpeed(){
         if (this.speedLevel > 0){
@@ -182,12 +147,14 @@ public class Controller {
                 System.out.println("default");
                 break;
         }
-        String s = String.format("     %d/10", this.speedLevel);
+        String s = String.format("    Speed: %d/10", this.speedLevel);
+        this.simTime += 10;
         speedSetting.setText(s);
 
     }
 
     public void manageFocus(){
+        skuska.setText(String.format("%02d:%02d:%02d", (simTime/3600000)%24, (simTime/60000)%60, (simTime/1000)%60));
         Grid grid = simulation.getGrid();
         if (focusVehicle != null){
             String toWrite = this.focusVehicle.printStats();
@@ -235,7 +202,6 @@ public class Controller {
 
 
     public void redraw(Grid grid){
-
         for (int i = 0; i < grid.dimension; i++) {
             for (int j = 0; j < grid.dimension; j++) {
                 if (grid.layout[i][j].isShelf()){
@@ -262,7 +228,10 @@ public class Controller {
             if (this.focusVehicle.hasPath()){
                 ArrayList<Tile> path = this.focusVehicle.getPath();
                 for (Tile tileGrid : path){
-                    setAsVehiclePath(this.maingrid, tileGrid.getX(), tileGrid.getY());
+                    if (!tileGrid.hasVehicle()){
+                        setAsVehiclePath(this.maingrid, tileGrid.getX(), tileGrid.getY());
+                    }
+
                 }
 
             }
@@ -277,6 +246,7 @@ public class Controller {
 
         }
         manageFocus();
+
     }
 
     private void setAsShelf(GridPane grid, int row, int col){
@@ -293,7 +263,7 @@ public class Controller {
         for (Node node : grid.getChildren()) {
             if (GridPane.getColumnIndex(node) == col && GridPane.getRowIndex(node) == row) {
                 UITile tile = (UITile) node;
-                tile.rectangle.setFill(Color.BLUE);
+                tile.rectangle.setFill(Color.STEELBLUE);
             }
         }
 
@@ -304,7 +274,7 @@ public class Controller {
         for (Node node : grid.getChildren()) {
             if (GridPane.getColumnIndex(node) == col && GridPane.getRowIndex(node) == row) {
                 UITile tile = (UITile) node;
-                tile.rectangle.setFill(Color.RED);
+                tile.rectangle.setFill(Color.INDIANRED);
             }
         }
 
@@ -325,7 +295,7 @@ public class Controller {
         for (Node node : grid.getChildren()) {
             if (GridPane.getColumnIndex(node) == col && GridPane.getRowIndex(node) == row) {
                 UITile tile = (UITile) node;
-                tile.rectangle.setFill(Color.GREEN);
+                tile.rectangle.setFill(Color.DARKSEAGREEN);
             }
         }
 
@@ -335,23 +305,11 @@ public class Controller {
         for (Node node : grid.getChildren()) {
             if (GridPane.getColumnIndex(node) == col && GridPane.getRowIndex(node) == row) {
                 UITile tile = (UITile) node;
-                tile.rectangle.setFill(Color.YELLOW);
+                tile.rectangle.setFill(Color.BLANCHEDALMOND);
             }
         }
 
     }
-
-
-
-    /**private void changeTile(GridPane grid, int col, int row){
-        for (Node node : grid.getChildren()) {
-            if (GridPane.getColumnIndex(node) == col && GridPane.getRowIndex(node) == row) {
-                UITile tile = (UITile) node;
-                tile.rectangle.setFill(Color.BLUE);
-            }
-        }
-
-    }*/
 
     public void testPrint(){
         if (this.focusVehicle != null){
@@ -389,7 +347,6 @@ public class Controller {
             rectangle.setStroke(Color.BLACK);
             rectangle.setStrokeType(StrokeType.INSIDE);
             setOnMouseClicked(e -> {
-                //System.out.println(positionX + " " + positionY);
                 onClick(positionX, positionY);
 
 
@@ -404,7 +361,9 @@ public class Controller {
 
             nextStep();
             redraw(simulation.getGrid());
+            simTime += 10000L;
             t.schedule(new toSchedule(), speed);
+
 
         }
     }
