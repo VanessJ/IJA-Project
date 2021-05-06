@@ -39,7 +39,7 @@ public class A_Star {
         ArrayList<Node> path = graph.executeAStar();
 
         if(path == null){
-            System.out.println("There is no path to target");
+            //System.out.println("There is no path to target");
             return null;
         }
         else {

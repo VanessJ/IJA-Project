@@ -126,7 +126,7 @@ public class Vehicle {
     public void nextMove(){
 
         if((this.finished)&& (this.ordered.size()!= 0)){
-            System.out.println("Lenive hovna");
+            //System.out.println("Lenive hovna");
             this.finished = false;
         }
 
@@ -136,13 +136,13 @@ public class Vehicle {
                 return;
             }
             this.path = path;
-            System.out.println(this.path.size());
+            //System.out.println(this.path.size());
             this.active = true;
         }
 
         if(isFinished()){
             Tile tile = this.grid.getTile(this.x, this.y);
-            System.out.println("Auto skoncilo");
+            //System.out.println("Auto skoncilo");
             tile.unbindVehicle(this);
             return;
         }
@@ -153,7 +153,7 @@ public class Vehicle {
                 if (path == null){
                     return;
                 }
-                System.out.println("Vozik je plny, rozhodol sa ist k DP");
+                //System.out.println("Vozik je plny, rozhodol sa ist k DP");
                 this.path = path;
                 this.active = true;
             }
@@ -173,7 +173,7 @@ public class Vehicle {
                 //vyklada item
                 if (this.comingFor != null){
                     this.ordered.remove(0); //removne to z objednavky
-                    System.out.println("Vozik nabral objekt " + this.comingFor.getType());
+                    //System.out.println("Vozik nabral objekt " + this.comingFor.getType());
                     this.held.add(this.comingFor);
                     grid.findAndRemove(this.comingFor);
                     this.comingFor = null;
@@ -182,7 +182,7 @@ public class Vehicle {
                 }
                 //ide do DP
                 else {
-                    System.out.println("Vozik priniesol naklad do DP");
+                    //System.out.println("Vozik priniesol naklad do DP");
                     this.amount = 0;
                     while (this.held.size() != 0){
                         this.held.remove(0);
@@ -212,8 +212,7 @@ public class Vehicle {
                         }
                         else {
                             ArrayList<Tile> path2 = this.returnToDP();
-                            System.out.println("Toto");
-                            System.out.println("Vozik je plny, rozhodol sa ist k DP");
+                            //System.out.println("Vozik je plny, rozhodol sa ist k DP");
                             this.path = path2;
                             if (path2 == null){
                                 this.active = false;
@@ -226,7 +225,7 @@ public class Vehicle {
                 int newX = tile.getX();
                 int newY = tile.getY();
                 this.moveTo(newX, newY);
-                System.out.format("Vozik stoji na suradnici %d %d\n", newX, newY);
+                //System.out.format("Vozik stoji na suradnici %d %d\n", newX, newY);
             }
         }
     }
@@ -258,7 +257,7 @@ public class Vehicle {
             System.exit(-1);
         }
 
-        System.out.format("Vozik pocita cestu pre novu objednavku %s\n", item.getType());
+        //System.out.format("Vozik pocita cestu pre novu objednavku %s\n", item.getType());
         int start_x = this.x;
         int start_y = this.y;
         int end_x = tile.getX();

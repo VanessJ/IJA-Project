@@ -22,6 +22,7 @@ public class GUI extends Application {
         primaryStage.setTitle("Warehouse simulation");
         Scene mainScene = new Scene(root, 800, 600);
         primaryStage.setScene(mainScene);
+        primaryStage.setResizable(false);
         primaryStage.show();
     }
 

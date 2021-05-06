@@ -6,6 +6,7 @@ import ija.ija2021.project.model.Simulation;
 import ija.ija2021.project.model.Vehicle;
 import ija.ija2021.project.model.tiles.Shelf;
 import ija.ija2021.project.model.tiles.Tile;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -22,13 +23,15 @@ import javafx.scene.shape.StrokeType;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 public class Controller {
 
     private int speedLevel;
     private int speed;
-    private long simTime = 10000L;
+    private long simTime;
     private Simulation simulation;
     private final int GRID_WIDTH = 600;
     private final int GRID_HEIGHT = 460;
@@ -36,6 +39,7 @@ public class Controller {
 
     private Shelf focusShelf;
     private Vehicle focusVehicle;
+    private Lock lock = new ReentrantLock();
 
 
     @FXML
@@ -52,10 +56,10 @@ public class Controller {
 
 
     public void init(){
-        this.speedLevel = 5;
-        this.setSpeed();
-        this.objednavka.setEditable(false);
-        this.skuska.setEditable(false);
+         this.speedLevel = 5;
+         this.setSpeed();
+         this.objednavka.setEditable(false);
+         this.skuska.setEditable(false);
          this.simulation = new Simulation();
          simulation.loadGrid();
          Grid grid = simulation.getGrid();
@@ -85,6 +89,9 @@ public class Controller {
         this.simulation.loadGrid();
         this.simulation.simulate();
         this.simTime = 0;
+        this.focusVehicle = null;
+        this.focusShelf = null;
+        objednavka.setText("");
     }
 
     public void lowerSpeed(){
@@ -124,45 +131,39 @@ public class Controller {
                 break;
             case 6:
                 this.speed = 400;
-                System.out.println("6");
                 break;
             case 7:
                 this.speed = 200;
-                System.out.println("7");
                 break;
             case 8:
                 this.speed = 100;
-                System.out.println("8");
                 break;
             case 9:
                 this.speed = 50;
-                System.out.println("9");
                 break;
             case 10:
-                this.speed = 10;
-                System.out.println("10");
+                this.speed = 20;
                 break;
             default:
                 this.speed = 500;
-                System.out.println("default");
                 break;
         }
         String s = String.format("    Speed: %d/10", this.speedLevel);
-        this.simTime += 10;
         speedSetting.setText(s);
 
     }
 
     public void manageFocus(){
+        //skuska.setText("Ahoj");
+        //System.out.format("%02d:%02d:%02d\n", (simTime/3600000)%24, (simTime/60000)%60, (simTime/1000)%60);
         skuska.setText(String.format("%02d:%02d:%02d", (simTime/3600000)%24, (simTime/60000)%60, (simTime/1000)%60));
-        Grid grid = simulation.getGrid();
         if (focusVehicle != null){
             String toWrite = this.focusVehicle.printStats();
             objednavka.setText(toWrite);
 
         }
         if (focusShelf != null){
-            this.focusShelf.printStats();
+            //this.focusShelf.printStats();
             String toWrite = this.focusShelf.getStats();
             objednavka.setText(toWrite);
         }
@@ -228,7 +229,7 @@ public class Controller {
             if (this.focusVehicle.hasPath()){
                 ArrayList<Tile> path = this.focusVehicle.getPath();
                 for (Tile tileGrid : path){
-                    if (!tileGrid.hasVehicle()){
+                    if (!tileGrid.hasVehicle() && !tileGrid.isDP()){
                         setAsVehiclePath(this.maingrid, tileGrid.getX(), tileGrid.getY());
                     }
 
@@ -330,7 +331,12 @@ public class Controller {
 
     public void nextStep(){
         this.simulation.next_step();
-        redraw(this.simulation.getGrid());
+        Platform.runLater(new Runnable() {
+            @Override public void run() {
+                redraw(simulation.getGrid());
+            }
+        });
+
     }
 
 
@@ -360,7 +366,6 @@ public class Controller {
         public void run() {
 
             nextStep();
-            redraw(simulation.getGrid());
             simTime += 10000L;
             t.schedule(new toSchedule(), speed);
 
