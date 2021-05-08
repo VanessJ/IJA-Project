@@ -3,3 +3,8 @@ Rezne 5
 Cola 10
 Sardinka 7
 Mrkva 15
+Milka 4
+Rezne 5
+Cola 10
+Sardinka 7
+Mrkva 15

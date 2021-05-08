@@ -12,6 +12,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.GridPane;
 
 import javafx.scene.control.TextArea;
@@ -154,8 +155,6 @@ public class Controller {
     }
 
     public void manageFocus(){
-        //skuska.setText("Ahoj");
-        //System.out.format("%02d:%02d:%02d\n", (simTime/3600000)%24, (simTime/60000)%60, (simTime/1000)%60);
         skuska.setText(String.format("%02d:%02d:%02d", (simTime/3600000)%24, (simTime/60000)%60, (simTime/1000)%60));
         if (focusVehicle != null){
             String toWrite = this.focusVehicle.printStats();
@@ -309,6 +308,17 @@ public class Controller {
                 tile.rectangle.setFill(Color.BLANCHEDALMOND);
             }
         }
+
+    }
+
+    @FXML
+    private void onZoom(ScrollEvent event){
+        event.consume();
+        double zoom = event.getDeltaY() > 0? 1.1 : 0.9;
+        maingrid.setScaleX(zoom * maingrid.getScaleX());
+        maingrid.setScaleY(zoom * maingrid.getScaleY());
+
+
 
     }
 
