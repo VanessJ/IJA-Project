@@ -10,12 +10,19 @@ import java.util.stream.Collectors;
 
 
 public class Simulation {
+    /***
+     * Class responsible for loading the map, data, generating the cars and simulating movement
+     * authors: Vanessa Jóriová, Marián Zimmerman
+     */
 
     private Grid grid;
     private ArrayList<Item> order = new java.util.ArrayList<Item>();
     private ArrayList<Vehicle> vehicles = new java.util.ArrayList<>();
 
 
+    /***
+     * loads map internal representation from file
+     */
     public void loadGrid(){
         this.grid = new Grid();
         grid.LoadLayout("data/layout.txt");
@@ -26,10 +33,18 @@ public class Simulation {
 
     }
 
+    /***
+     *
+     * @return current grid
+     */
+
     public Grid getGrid() {
         return grid;
     }
 
+    /***
+     * starts simulation by generating cars and filling shelves with goods
+     */
     public void simulate(){
 
         this.loadOrder("data/order.txt");
@@ -37,25 +52,15 @@ public class Simulation {
         this.generateCars();
         this.distributeOrder();
 
-        /*Vehicle vehicle = this.vehicles.get(2);
-        vehicle.nextMove();
-        vehicle.nextMove();
-        vehicle.nextMove();
-        vehicle.nextMove();
-        Vehicle vehicle2 = this.vehicles.get(1);
-        vehicle2.nextMove();
-        vehicle2.nextMove();
-        vehicle2.nextMove();
-        vehicle2.nextMove();
-        vehicle2.nextMove();*/
 
     }
 
 
-
+    /***
+     * every vehicle calculates it's next step
+     */
     public void next_step(){
-        /*Vehicle vehicle = this.vehicles.get(0);
-        vehicle.nextMove();*/
+
 
         for (Vehicle vehicle : this.vehicles){
             vehicle.nextMove();
@@ -63,6 +68,10 @@ public class Simulation {
 
     }
 
+    /***
+     *
+     * @param path path to file
+     */
     public void loadOrder(String path){
         try {
             File file = new File(path);
@@ -88,17 +97,29 @@ public class Simulation {
 
     }
 
+    /***
+     * Prints all orders grouped by type
+     */
+
     public void printOrder(){
         Map<String, Long> counting = this.order.stream().collect(
                 Collectors.groupingBy(Item::getType, Collectors.counting()));
         System.out.println("Nacitana objednavka: " + counting);
     }
 
+    /***
+     * Prints all orders from vehicles
+     */
+
     public void printOrders(){
         for (Vehicle car : this.vehicles){
             car.printOrder();
         }
     }
+
+    /***
+     * Distributes ordered items between cars
+     */
 
     public void distributeOrder(){
         int avarage = this.order.size()/ this.vehicles.size();
@@ -122,6 +143,9 @@ public class Simulation {
     }
 
 
+    /***
+     * Generates cars
+     */
     public void generateCars(){
         Vehicle vehicle1 = new Vehicle(10, this.grid, 1);
         this.vehicles.add(vehicle1);

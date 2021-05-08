@@ -8,9 +8,22 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class A_Star {
+    /***
+     * A* pathfinding algorithm
+     * Authors: Vanessa Jóriová, Marián Zimmerman
+     */
 
     Grid grid;
 
+    /***
+     *
+     * @param grid internal representation of map
+     * @param start_x x coordinate of starting point
+     * @param start_y y coordinate of starting point
+     * @param end_x x coordinate of ending point
+     * @param end_y y coordinate of ending point
+     * @return null if no path found, arraylist of tiles if found
+     */
     public ArrayList<Tile> a_Star(Grid grid, int start_x, int start_y, int end_x, int end_y) {
         SquareGraph graph = new SquareGraph(grid.dimension, grid.dimension);
         this.grid = grid;
@@ -59,6 +72,11 @@ public class A_Star {
 
     }
 
+    /**
+     *
+     * @param path algorithm output that will be converted to tiles
+     * @return tiles path consisting of tiles in proper format
+     */
 
     private ArrayList<Tile> convertToTile(ArrayList<Node> path){
         ArrayList<Tile> tiles = new ArrayList<>();

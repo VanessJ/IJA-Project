@@ -50,6 +50,10 @@ public class Shelf extends Tile{
         }
     }
 
+    /***
+     *
+     * @return true if empty, false if not
+     */
     public boolean isEmpty(){
         if (this.amount == 0){
             return true;
@@ -58,6 +62,10 @@ public class Shelf extends Tile{
             return false;
         }
     }
+
+    /***
+     * prints stats of items shelved on this tile
+     */
 
     public void printStats(){
         if (this.isEmpty()){
@@ -72,6 +80,11 @@ public class Shelf extends Tile{
         counting.forEach((item,getType)->System.out.println(item + ": " + getType));
         //System.out.println(counting);
     }
+
+    /***
+     *
+     * @return string representation of item shelved on given tile grouped by type
+     */
 
     public String getStats(){
         String toWrite = "";
@@ -91,6 +104,13 @@ public class Shelf extends Tile{
 
     }
 
+    /**
+     *
+     * @param vehicle vehicle that is looking for given item
+     * @param toReserve item to be reserved
+     * @return Tile with given item or null if item was not found
+     */
+
     public Tile findAndReserve (Vehicle vehicle, Item toReserve){
         for (Item item: items){
             if (item.getType().equals(toReserve.getType())){
@@ -103,6 +123,12 @@ public class Shelf extends Tile{
         }
         return null;
     }
+
+    /***
+     *
+     * @param toRemove item to be removed
+     * @return true if item was found, false if not
+     */
 
     public boolean findAndRemove (Item toRemove){
         for (Item item: items){

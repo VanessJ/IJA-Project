@@ -4,6 +4,7 @@ public enum TileType {
 
     /***
      * Representation of user-made blockage in path
+     *
      */
     BLOCKAGE,
 

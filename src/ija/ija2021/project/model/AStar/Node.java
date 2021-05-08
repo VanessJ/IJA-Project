@@ -3,10 +3,15 @@ package ija.ija2021.project.model.AStar;
 import java.awt.*;
 
 class Node implements Comparable<Node>{
+    /***
+     * Class representation of node in A* grid
+     * authors: Vanessa Jóriová, Marián Zimmerman
+     */
 
     private enum State{
-        UNVISITED, OPEN, CLOSED
+         OPEN, CLOSED, UNVISITED
     }
+
     private enum Type{
         NORMAL, OBSTACLE
     }
@@ -14,15 +19,18 @@ class Node implements Comparable<Node>{
     private double costFromStart;
     private double costToTarget;
     private double totalCost;
-    private Node parent;
-    private State state;
-    private Type type;
     private int x;
     private int y;
+    private Type type;
+    private State state;
+    private Node parent;
 
-    public void UpdateCosts(){
-        this.totalCost = (this.costFromStart + this.costToTarget);
-    }
+    /***
+     *
+     * @param x x coordinate
+     * @param y y coordinate
+     * @param type type (NORMAL, OBSTACLE)
+     */
 
     public Node(int x, int y, String type){
         this.costFromStart = 0;
@@ -35,69 +43,117 @@ class Node implements Comparable<Node>{
         this.y = y;
     }
 
-    public Point getPosition(){
-        return new Point(x, y);
-    }
+    /***
+     *
+     * @return parent of node
+     */
 
     public Node getParent(){
         return parent;
     }
 
+    /***
+     *
+     * @param n node that will be set as parent
+     */
     public void setParent(Node n){
         this.parent = n;
     }
 
-    public double getCostFromStart(){
-        return costFromStart;
-    }
-
-    public double getCostToTarget(){
-        return costToTarget;
-    }
-
-    public void setCostFromStart(double cost){
-        this.costFromStart = cost;
-    }
-
-    public void setCostToTarget(double cost){
-        this.costFromStart = cost;
-    }
-
-    public double getTotalCost(){
-        return totalCost;
-    }
-
-    public void setTotalCost(double cost){
-        this.totalCost = cost;
-    }
-
-    public boolean isObstacle(){
-        return this.type == Type.OBSTACLE;
-    }
-
-    public boolean isOpen(){
-        return this.state == State.OPEN;
-    }
-
-    public boolean isClosed(){
-        return this.state == State.CLOSED;
-    }
-
-    public void setOpen(){
-        this.state = State.OPEN;
-    }
-
-    public void setClosed(){
-        this.state = State.CLOSED;
-    }
-
+    /***
+     *
+     * @return x coordinate
+     */
     public int getX(){
         return x;
     }
 
+    /**
+     *
+     * @return y coordinate
+     */
     public int getY(){
         return y;
     }
+
+    /***
+     *
+     * @return true if obstacle, false if not
+     */
+    public boolean isObstacle(){
+        return this.type == Type.OBSTACLE;
+    }
+
+    /***
+     *
+     * @return true if open, false if not
+     */
+    public boolean isOpen(){
+        return this.state == State.OPEN;
+    }
+
+    /***
+     *
+     * @return true if closed, false if not
+     */
+    public boolean isClosed(){
+        return this.state == State.CLOSED;
+    }
+
+    /***
+     * sets state as open
+     */
+    public void setOpen(){
+        this.state = State.OPEN;
+    }
+
+    /***
+     * sets state as closed
+     */
+    public void setClosed(){
+        this.state = State.CLOSED;
+    }
+
+    /***
+     *
+     * @return x, y coordinates
+     */
+    public Point getPosition(){
+        return new Point(x, y);
+    }
+
+    /***
+     *
+     * @return cost from start value
+     */
+    public double getCostFromStart(){
+        return costFromStart;
+    }
+
+    /***
+     *
+     * @param cost cost from start
+     */
+    public void setCostFromStart(double cost){
+        this.costFromStart = cost;
+    }
+
+    /***
+     *
+     * @return total cost value
+     */
+    public double getTotalCost(){
+        return totalCost;
+    }
+
+    /***
+     *
+     * @param cost total cost value
+     */
+    public void setTotalCost(double cost){
+        this.totalCost = cost;
+    }
+
 
     @Override
     public int compareTo(Node n){
@@ -119,8 +175,8 @@ class Node implements Comparable<Node>{
         else{
             Node n = (Node)o;
             Point firstPosition = this.getPosition();
-            Point secondPosition = n.getPosition();
-            return firstPosition.equals(secondPosition);
+            Point nextPosition = n.getPosition();
+            return firstPosition.equals(nextPosition);
         }
     }
 

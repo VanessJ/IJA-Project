@@ -8,6 +8,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Vehicle {
+    /***
+     * Classs representation of vehicle
+     * authors: Vanessa Jóriová, Marián Zimmerman
+     */
     private int capacity;
     private int amount;
     private boolean active;
@@ -25,6 +29,13 @@ public class Vehicle {
     private ArrayList<Item> held = new ArrayList<Item>();
     private ArrayList<Tile> path = new ArrayList<>();
 
+
+    /***
+     *
+     * @param capacity Capacity of new vehicle
+     * @param grid Map of the grid on which the vehicle will be moving
+     * @param number Number of new vehicle
+     */
     public Vehicle(int capacity, Grid grid, int number) {
         this.number = number;
         this.capacity = capacity;
@@ -40,25 +51,44 @@ public class Vehicle {
         this.positionTile.bindToVehicle(this);
     }
 
+    /***
+     *
+     * @param item Item that will be added to order list of new vehicle
+     */
+
     public void addToOrdered(Item item){
         this.ordered.add(item);
     }
 
+    /***
+     * Prints currently ordered items
+     */
     public void printOrder(){
         Map<String, Long> counting = this.ordered.stream().collect(
                 Collectors.groupingBy(Item::getType, Collectors.counting()));
         System.out.println("Nacitana objednavka: " + counting);
     }
 
-
+    /***
+     * Binds car and object for which the car is coming
+     * @param comingFor object for which the vehicle is currently coming
+     */
     public void setComingFor(Item comingFor) {
         this.comingFor = comingFor;
     }
 
-
+    /***
+     *
+     * @return true if vehicle has no more orders, false if not
+     */
     public boolean isFinished(){
         return this.finished;
     }
+
+    /***
+     *
+     * @return true if vehicle has any path calculated, false if not
+     */
 
     public boolean hasPath(){
         if (this.path != null){
@@ -69,6 +99,10 @@ public class Vehicle {
         }
     }
 
+    /***
+     *
+     * @return calculated path between vehicle and its target
+     */
     public ArrayList<Tile> getPath() {
         return path;
     }
@@ -95,6 +129,10 @@ public class Vehicle {
         return toWrite;
     }
 
+    /***
+     *
+     * @return string representation of all orders grouped by type
+     */
     public String getOrders(){
         String toWrite = "";
         Map<String, Long> counting = this.ordered.stream().collect(
@@ -104,6 +142,11 @@ public class Vehicle {
         }
         return toWrite;
     }
+
+    /***
+     *
+     * @return string representation of currently held items grouped by type
+     */
 
     public String getHeld(){
         String toWrite = "";
@@ -115,6 +158,10 @@ public class Vehicle {
         return toWrite;
     }
 
+    /***
+     *
+     * @return true if full, false if vehicle has capacity for more items
+     */
     public boolean isFull(){
         if (this.amount >= this.capacity){
             return true;
@@ -122,11 +169,17 @@ public class Vehicle {
         return false;
     }
 
-
+    /***
+     * Vehicle decides its next action:
+     *      - calculate path to ordered item
+     *      - calculate path to delivery point if full
+     *      - calculate path to delivery point if there are no more ordered items to grab
+     *      - move (change x,y coordinates)
+     *      - recalculate path if current path is obstructed
+     */
     public void nextMove(){
 
         if((this.finished)&& (this.ordered.size()!= 0)){
-            //System.out.println("Lenive hovna");
             this.finished = false;
         }
 
@@ -136,13 +189,11 @@ public class Vehicle {
                 return;
             }
             this.path = path;
-            //System.out.println(this.path.size());
             this.active = true;
         }
 
         if(isFinished()){
             Tile tile = this.grid.getTile(this.x, this.y);
-            //System.out.println("Auto skoncilo");
             tile.unbindVehicle(this);
             return;
         }
@@ -153,7 +204,7 @@ public class Vehicle {
                 if (path == null){
                     return;
                 }
-                //System.out.println("Vozik je plny, rozhodol sa ist k DP");
+
                 this.path = path;
                 this.active = true;
             }
@@ -173,7 +224,6 @@ public class Vehicle {
                 //vyklada item
                 if (this.comingFor != null){
                     this.ordered.remove(0); //removne to z objednavky
-                    //System.out.println("Vozik nabral objekt " + this.comingFor.getType());
                     this.held.add(this.comingFor);
                     grid.findAndRemove(this.comingFor);
                     this.comingFor = null;
@@ -182,7 +232,6 @@ public class Vehicle {
                 }
                 //ide do DP
                 else {
-                    //System.out.println("Vozik priniesol naklad do DP");
                     this.amount = 0;
                     while (this.held.size() != 0){
                         this.held.remove(0);
@@ -212,7 +261,6 @@ public class Vehicle {
                         }
                         else {
                             ArrayList<Tile> path2 = this.returnToDP();
-                            //System.out.println("Vozik je plny, rozhodol sa ist k DP");
                             this.path = path2;
                             if (path2 == null){
                                 this.active = false;
@@ -225,16 +273,15 @@ public class Vehicle {
                 int newX = tile.getX();
                 int newY = tile.getY();
                 this.moveTo(newX, newY);
-                //System.out.format("Vozik stoji na suradnici %d %d\n", newX, newY);
             }
         }
     }
 
-
-    public void setCoords(int newX, int newY){
-        this.x = newX;
-        this.y = newY;
-    }
+    /***
+     * Vehicle moves to different location of grid by changing its coordinates
+     * @param newX new x coordinate
+     * @param newY new y coordinate
+     */
 
     public void moveTo(int newX, int newY){
         Tile tile = this.grid.getTile(this.x, this.y);
@@ -247,9 +294,12 @@ public class Vehicle {
         this.positionTile = tile;
     }
 
+    /***
+     *
+     * @return calculated path between vehicle and its target (item)
+     */
     public ArrayList<Tile> calculatePath(){
 
-        //TODO vymyslieť neretardovaný spôsob
         Item item = this.ordered.get(0);
         Tile tile = this.grid.findAndReserve(this, item);
         if (tile == null){
@@ -257,11 +307,10 @@ public class Vehicle {
             System.exit(-1);
         }
 
-        //System.out.format("Vozik pocita cestu pre novu objednavku %s\n", item.getType());
         int start_x = this.x;
         int start_y = this.y;
         int end_x = tile.getX();
-        int end_y = tile.getY() - 1; //PLACEHOLDER - kým nevymyslím lepší spôsob
+        int end_y = tile.getY() - 1;
         ArrayList<Tile> path = this.pathfinder.a_Star(this.grid, start_x, start_y, end_x, end_y);
         if (path == null){
             //skusit z druhej strany
@@ -272,9 +321,12 @@ public class Vehicle {
         return path;
     }
 
+    /***
+     *
+     * @return calculated path to delivery point
+     */
 
     public ArrayList<Tile> returnToDP(){
-        //TODO vymyslieť neretardovaný spôsob
         Tile tile = this.grid.getDP();
         int start_x = this.x;
         int start_y = this.y;

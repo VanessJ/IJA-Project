@@ -10,6 +10,10 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Grid {
+    /***
+     * Internal representation of warehouse map
+     * authors: Vanessa Jóriová, Marián Zimmerman
+     */
 
     public Tile[][] layout;
     public int dimension;
@@ -17,6 +21,10 @@ public class Grid {
     private int deliveryX;
     private int deliveryY;
 
+    /***
+     *
+     * @param path path to file from which the layout will be loaded
+     */
     public void LoadLayout(String path) {
 
         int shelfNumber = 1;
@@ -66,6 +74,13 @@ public class Grid {
         }
     }
 
+    /***
+     *
+     * @param x x coordinate
+     * @param y y coordinate
+     * @return tile on that position
+     */
+
     public Tile getTile(int x, int y){
         return this.layout[x][y];
     }
@@ -82,7 +97,11 @@ public class Grid {
 
     }*/
 
-
+    /***
+     *
+     * @param item item to be added
+     * @return true if added succesfully, false if warehouse is full
+     */
     public boolean addItem(Item item){
         for (Shelf shelf : this.shelves){
             if (!shelf.isFull()){
@@ -95,6 +114,12 @@ public class Grid {
     }
 
 
+    /***
+     *
+     * @param vehicle vehicle which wants to reserve given item
+     * @param toRemove item that will be reserved and later removed by vehicle
+     * @return tile with given item if found, null if not
+     */
     public Tile findAndReserve (Vehicle vehicle, Item toRemove){
         Tile tile;
         for (Shelf shelf: this.shelves){
@@ -106,7 +131,10 @@ public class Grid {
         return null;
     }
 
-
+    /***
+     *
+     * @param toRemove item that will be removed
+     */
     public void findAndRemove (Item toRemove){
         for (Shelf shelf: this.shelves){
             boolean removed = shelf.findAndRemove(toRemove);
@@ -118,6 +146,10 @@ public class Grid {
     }
 
 
+    /***
+     *
+     * @param path path to file containing goods in warehouse
+     */
     public void loadGoods(String path){
         try {
             File file = new File(path);
@@ -145,7 +177,9 @@ public class Grid {
         }
     }
 
-
+    /***
+     * prints stats of all shelves
+     */
     public void getStats(){
         for (Shelf shelf : this.shelves){
             if (!shelf.isEmpty()){
@@ -156,29 +190,59 @@ public class Grid {
     }
 
 
+    /***
+     *
+     * @param x x coordinate
+     * @param y y coordinate
+     * @return string representation of shelf stats
+     */
+
     public String getShelfStats(int x, int y){
         Shelf shelf = (Shelf)this.layout[x][y];
         String toWrite = shelf.getStats();
         return toWrite;
     }
 
-
+    /***
+     *
+     * @param x x coordinate
+     * @param y y coordinate
+     * @return shelf on given coordinates
+     */
     public Shelf getShelf(int x, int y){
         Shelf shelf = (Shelf)this.layout[x][y];
         return shelf;
     }
+
+    /***
+     *
+     * @param x x coordinate
+     * @param y y coordinate
+     * @return vehicle on given coordinate
+     */
 
     public Vehicle getVehicle(int x, int y){
         Tile tile = this.layout[x][y];
         return tile.getVehicle();
     }
 
+
+    /***
+     *
+     * @param x x coordinate
+     * @param y y coordinate
+     * @return string form of stats of vehicle on given position
+     */
     public String getSVehicleStats(int x, int y){
         Tile tile = this.layout[x][y];
         String toWrite = tile.getVehicle().printStats();
         return toWrite;
     }
 
+    /***
+     *
+     * @return delivery point of this grid
+     */
     public Tile getDP(){
         Tile DP = this.layout[this.deliveryX][this.deliveryY];
         return DP;
@@ -212,12 +276,18 @@ public class Grid {
     }
 
 
-
-
+    /***
+     *
+     * @return x coordinate of delivery point
+     */
     public int getDeliveryX() {
         return deliveryX;
     }
 
+    /***
+     *
+     * @return y coordinate of delivery point
+     */
     public int getDeliveryY() {
         return this.deliveryY;
     }

@@ -15,6 +15,11 @@ public class SquareGraph {
     private Heap<Node> openNodes;
     private Set<Node> closedNodes;
 
+    /***
+     *
+     * @param width width of graph
+     * @param length length of graph
+     */
     public SquareGraph(int width, int length){
         map = new Node[width][length];
         startPosition = new Point();
@@ -23,91 +28,81 @@ public class SquareGraph {
         closedNodes = new HashSet<Node>();
     }
 
-    public Node getMapCell(Point coord){
-        return map[(int)coord.getX()][(int)coord.getY()];
-    }
 
-    public void setMapCell(Point coord, Node n){
-        map[(int)coord.getX()][(int)coord.getY()] = n;
-    }
-
+    /***
+     *
+     * @return start position
+     */
     public Point getStartPosition(){
         return startPosition;
     }
 
-    public Point getTargetPosition(){
-        return targetPosition;
-    }
 
+    /***
+     *
+     * @param coord starting coordinates
+     */
     public void setStartPosition(Point coord){
         startPosition.setLocation(coord);
     }
 
+    /***
+     *
+     * @param coord coordinates of wanted map cell
+     * @return map cell with given coordinates
+     */
+    public Node getMapCell(Point coord){
+        return map[(int)coord.getX()][(int)coord.getY()];
+    }
+
+
+    /**
+     *
+     * @param coord coordinates of wanted map cell
+     * @param n node
+     */
+    public void setMapCell(Point coord, Node n){
+        map[(int)coord.getX()][(int)coord.getY()] = n;
+    }
+
+
+    /***
+     *
+     * @return target position
+     */
+    public Point getTargetPosition(){
+        return targetPosition;
+    }
+
+    /***
+     *
+     * @param coord new coordinates of target
+     */
     public void setTargetPosition(Point coord){
         targetPosition.setLocation(coord);
     }
 
+    /***
+     *
+     * @return map dimension
+     */
     public int getDimension(){
         return map.length;
     }
 
-    public void addToOpenNodes(Node n){
-        n.setOpen();
-        openNodes.add(n);
-    }
-
-    public Node popBestOpenNode(){
-        return openNodes.remove();
-    }
-
-    public void addToClosedNodes(Node n){
-        n.setClosed();
-        closedNodes.add(n);
-    }
-
+    /***
+     *
+     * @param p point
+     * @return true if point is inside map, false if not
+     */
     public boolean isInsideMap(Point p){
         return ( (p.getX() >= 0) && (p.getX() < getDimension())  && (p.getY() >= 0) && (p.getY() < getDimension()) );
     }
 
-    public Set<Node> getNeighbours(Node n){
-        Set<Node> neighbours = new HashSet<Node>();
-        for(int i=-1; i<=1; i++){
-            for(int j=-1; j<=1; j++){
-                if( !(i==0 && j==0) )
-                    if(isInsideMap(new Point(n.getX() + i,n.getY() + j))){
-                        Node temp = getMapCell(new Point(n.getX() + i,n.getY() +  j));
-                        if(!temp.isObstacle())
-                            neighbours.add(temp);
-                    }
-
-            }
-        }
-        return neighbours;
-    }
-
-    static double calculateDistance(Point from, Point to){
-        return Math.pow(Math.pow(from.getX()-to.getX(), 2) + Math.pow(from.getY() - to.getY(), 2) , 0.5);
-    }
-
-    public ArrayList<Node> reconstructPath(Node target){
-        ArrayList<Node> path = new ArrayList<Node>();
-        Node current = target;
-
-        while(current.getParent() != null){
-            path.add(current.getParent());
-            current = current.getParent();
-        }
-        Collections.reverse(path);
-        return path;
-    }
-
-    public void printPath(ArrayList<Node> path){
-        for(int i=0; i<path.size(); i++){
-            Node node = path.get(i);
-            System.out.println("node : (" + node.getX() + "," + node.getY() + ")");
-        }
-    }
-
+    /***
+     *
+     * @return path to target if successful, null if not
+     */
     public ArrayList<Node> executeAStar(){
         Node start = getMapCell(getStartPosition());
         Node target = getMapCell(getTargetPosition());
@@ -141,5 +136,83 @@ public class SquareGraph {
 
         return null;
     }
+
+
+    /**
+     *
+     * @param n node
+     * @return set of neighbours of given set
+     */
+    public Set<Node> getNeighbours(Node n){
+        Set<Node> neighbours = new HashSet<Node>();
+        for(int i=-1; i<=1; i++){
+            for(int j=-1; j<=1; j++){
+                if( !(i==0 && j==0) )
+                    if(isInsideMap(new Point(n.getX() + i,n.getY() + j))){
+                        Node temp = getMapCell(new Point(n.getX() + i,n.getY() +  j));
+                        if(!temp.isObstacle())
+                            neighbours.add(temp);
+                    }
+
+            }
+        }
+        return neighbours;
+    }
+
+    /***
+     *
+     * @param n node that will be added
+     */
+    public void addToOpenNodes(Node n){
+        n.setOpen();
+        openNodes.add(n);
+    }
+
+    /***
+     *
+     * @return best open node
+     */
+    public Node popBestOpenNode(){
+        return openNodes.remove();
+    }
+
+    /***
+     *
+     * @param n node to add
+     */
+    public void addToClosedNodes(Node n){
+        n.setClosed();
+        closedNodes.add(n);
+    }
+
+    /***
+     *
+     * @param from starting point
+     * @param to end point
+     * @return distance
+     */
+
+    static double calculateDistance(Point from, Point to){
+        return Math.pow(Math.pow(from.getX()-to.getX(), 2) + Math.pow(from.getY() - to.getY(), 2) , 0.5);
+    }
+
+    /***
+     *
+     * @param target target node
+     * @return final path
+     */
+    public ArrayList<Node> reconstructPath(Node target){
+        ArrayList<Node> path = new ArrayList<Node>();
+        Node current = target;
+
+        while(current.getParent() != null){
+            path.add(current.getParent());
+            current = current.getParent();
+        }
+        Collections.reverse(path);
+        return path;
+    }
+
+
 
 }

@@ -24,11 +24,14 @@ import javafx.scene.shape.StrokeType;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+
 
 
 public class Controller {
+    /***
+     * Controller class
+     * Authors: Vanessa Jóriová, Marián Zimmerman
+     */
 
     private int speedLevel;
     private int speed;
@@ -40,7 +43,7 @@ public class Controller {
 
     private Shelf focusShelf;
     private Vehicle focusVehicle;
-    private Lock lock = new ReentrantLock();
+
 
 
     @FXML
@@ -54,7 +57,9 @@ public class Controller {
     public Button slower;
 
 
-
+    /***
+     * Starts simulation by loading dynamic layout and setting default values
+     */
 
     public void init(){
          this.speedLevel = 5;
@@ -85,6 +90,9 @@ public class Controller {
 
     }
 
+    /***
+     * restarts simulation
+     */
     public void restart(){
         this.simulation = new Simulation();
         this.simulation.loadGrid();
@@ -95,6 +103,9 @@ public class Controller {
         objednavka.setText("");
     }
 
+    /***
+     * lowers speed of simulation
+     */
     public void lowerSpeed(){
         if (this.speedLevel > 0){
             this.speedLevel--;
@@ -103,6 +114,9 @@ public class Controller {
 
     }
 
+    /**
+     * makes simulation go faster
+     */
     public void fasterSpeed(){
         if (this.speedLevel < 10){
             this.speedLevel++;
@@ -110,6 +124,9 @@ public class Controller {
         }
     }
 
+    /***
+     * sets wait period based on current simulation speed level
+     */
     public void setSpeed(){
         switch(this.speedLevel){
             case 0:
@@ -154,6 +171,9 @@ public class Controller {
 
     }
 
+    /***
+     * rewrites stats of shelf/vehicle if shelf/vehicle is focused by user
+     */
     public void manageFocus(){
         skuska.setText(String.format("%02d:%02d:%02d", (simTime/3600000)%24, (simTime/60000)%60, (simTime/1000)%60));
         if (focusVehicle != null){
@@ -169,6 +189,11 @@ public class Controller {
 
     }
 
+    /***
+     * Decides next action based on x, y coordinates of clicked tile
+     * @param x x coordinate
+     * @param y y coordinate
+     */
     private void onClick(int x, int y){
         Grid grid = simulation.getGrid();
         Tile tile = grid.layout[x][y];
@@ -201,6 +226,10 @@ public class Controller {
     }
 
 
+    /***
+     * Redraws grid based on internal representation
+     * @param grid internal representation of grid
+     */
     public void redraw(Grid grid){
         for (int i = 0; i < grid.dimension; i++) {
             for (int j = 0; j < grid.dimension; j++) {
@@ -249,6 +278,12 @@ public class Controller {
 
     }
 
+    /***
+     *
+     * @param grid GridPane
+     * @param row row
+     * @param col column
+     */
     private void setAsShelf(GridPane grid, int row, int col){
         for (Node node : grid.getChildren()) {
             if (GridPane.getColumnIndex(node) == col && GridPane.getRowIndex(node) == row) {
@@ -258,6 +293,13 @@ public class Controller {
         }
 
     }
+
+    /***
+     *
+     * @param grid GridPane
+     * @param row row
+     * @param col column
+     */
 
     private void setAsVehicle(GridPane grid, int row, int col){
         for (Node node : grid.getChildren()) {
@@ -269,6 +311,12 @@ public class Controller {
 
     }
 
+    /***
+     *
+     * @param grid GridPane
+     * @param row row
+     * @param col column
+     */
 
     private void setAsBlockage(GridPane grid, int row, int col){
         for (Node node : grid.getChildren()) {
@@ -280,6 +328,12 @@ public class Controller {
 
     }
 
+    /***
+     *
+     * @param grid GridPane
+     * @param row row
+     * @param col column
+     */
     private void setAsPath(GridPane grid, int row, int col){
         for (Node node : grid.getChildren()) {
             if (GridPane.getColumnIndex(node) == col && GridPane.getRowIndex(node) == row) {
@@ -291,6 +345,12 @@ public class Controller {
 
     }
 
+    /***
+     *
+     * @param grid GridPane
+     * @param row row
+     * @param col column
+     */
     private void setAsDP(GridPane grid, int row, int col){
         for (Node node : grid.getChildren()) {
             if (GridPane.getColumnIndex(node) == col && GridPane.getRowIndex(node) == row) {
@@ -301,6 +361,12 @@ public class Controller {
 
     }
 
+    /***
+     *
+     * @param grid GridPane
+     * @param row row
+     * @param col column
+     */
     private void setAsVehiclePath(GridPane grid, int row, int col){
         for (Node node : grid.getChildren()) {
             if (GridPane.getColumnIndex(node) == col && GridPane.getRowIndex(node) == row) {
@@ -311,6 +377,10 @@ public class Controller {
 
     }
 
+    /***
+     *
+     * @param event Scrollevent
+     */
     @FXML
     private void onZoom(ScrollEvent event){
         event.consume();
@@ -322,7 +392,10 @@ public class Controller {
 
     }
 
-    public void testPrint(){
+    /***
+     * gets order input from user and adds it to currently focused vehicle
+     */
+    public void inputOrder(){
         if (this.focusVehicle != null){
             String input = zadat.getText();
             System.out.println(input);
@@ -339,6 +412,9 @@ public class Controller {
         redraw(this.simulation.getGrid());
     }
 
+    /***
+     * calculates next step and redraws map
+     */
     public void nextStep(){
         this.simulation.next_step();
         Platform.runLater(new Runnable() {
@@ -351,10 +427,18 @@ public class Controller {
 
 
     class UITile extends Pane {
+
         private int positionX;
         private int positionY;
         private Rectangle rectangle;
 
+        /***
+         *
+         * @param x x coordinate
+         * @param y y coordinate
+         * @param tileWidth width of tile
+         * @param tileHeight height of tile
+         */
         public UITile(int x, int y, double tileWidth, double tileHeight) {
             positionX = x;
             positionY = y;
@@ -373,6 +457,10 @@ public class Controller {
 
 
     class toSchedule extends TimerTask {
+
+        /***
+         * scheduled action
+         */
         public void run() {
 
             nextStep();
