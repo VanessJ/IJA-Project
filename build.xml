@@ -1,0 +1,32 @@
+<project>
+
+    <target name="clean">
+        <delete dir="Java/build"/>
+        <delete dir="doc"/>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="build/"/>
+        <javadoc sourcepath="src" destdir="doc">
+
+        </javadoc>
+        <javac srcdir="src" includeantruntime="false" destdir="build">
+            <compilerarg line ="--add-modules javafx.controls.javafx.fxml"/>
+        </javac>
+        <copy todir="build">
+            <fileset dir="src" includes="**/*.fxml"/>
+        </copy>
+        <mkdir dir="dest"/>
+        <jar destfile="dest/Warehouse.jar" basedir="build">
+            <manifest>
+                <attribute name="Main-Class" value="ija/ija2021/project/MainClass"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="run">
+        <java jar="dest/Warehouse.jar" fork="true">
+        </java>    
+    </target>
+       
+</project>
